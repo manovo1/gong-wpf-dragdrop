@@ -24,10 +24,10 @@ namespace Showcase.WPF.DragDrop.Models
             alreadyDropped = false;
             var items = dragInfo.SourceItems.OfType<object>().ToList();
             var wrapper = new SerializableWrapper()
-                          {
-                              Items = items,
-                              DragDropCopyKeyState = DragDropKeyStates.ControlKey //dragInfo.DragDropCopyKeyState
-                          };
+            {
+                Items = items,
+                DragDropCopyKeyState = DragDropKeyStates.ControlKey //dragInfo.DragDropCopyKeyState
+            };
             dragInfo.Data = wrapper;
             dragInfo.DataFormat = DataFormats.GetDataFormat(DataFormats.Serializable);
             dragInfo.Effects = dragInfo.Data != null ? DragDropEffects.Copy | DragDropEffects.Move : DragDropEffects.None;
@@ -45,12 +45,11 @@ namespace Showcase.WPF.DragDrop.Models
 
         public void DragDropOperationFinished(DragDropEffects operationResult, IDragInfo dragInfo)
         {
-            if (alreadyDropped || dragInfo == null)
-            {
+            if (dragInfo == null)
                 return;
-            }
 
-            // the drag operation has finished on another app
+            // the drag operation has finished on another app/thread
+            // Methode wird ausgeführt sobald Drop erfolgt ist. 
             if (operationResult != DragDropEffects.None)
             {
                 if (operationResult.HasFlag(DragDropEffects.Move))
@@ -59,9 +58,15 @@ namespace Showcase.WPF.DragDrop.Models
                     var items = dragInfo.SourceItems.OfType<object>().ToList();
                     if (sourceList != null)
                     {
-                        foreach (var o in items)
+                        // alreadyDropped = True, wenn in gleichem Thread.
+                        // ansonsten ist dieser Wert = false
+                        // Elemente in sourceListe werden entfernt.
+                        if (alreadyDropped)
                         {
-                            sourceList.Remove(o);
+                            foreach (var o in items)
+                            {
+                                sourceList.Remove(o);
+                            }
                         }
                     }
                     alreadyDropped = true;
@@ -74,6 +79,11 @@ namespace Showcase.WPF.DragDrop.Models
         }
 
         public bool TryCatchOccurredException(Exception exception)
+        {
+            return false;
+        }
+
+        public bool UseDispatcher()
         {
             return false;
         }

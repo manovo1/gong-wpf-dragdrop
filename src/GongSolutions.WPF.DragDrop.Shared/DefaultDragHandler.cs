@@ -81,5 +81,10 @@ namespace GongSolutions.Wpf.DragDrop
         {
             return false;
         }
+
+        public bool UseDispatcher()
+        {
+            return false;
+        }
     }
 }

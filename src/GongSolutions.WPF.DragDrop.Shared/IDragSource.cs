@@ -28,6 +28,8 @@ namespace GongSolutions.Wpf.DragDrop
         /// </summary>
         bool CanStartDrag(IDragInfo dragInfo);
 
+        bool UseDispatcher();
+
         /// <summary>
         /// Notifies the drag handler that a drop has occurred.
         /// </summary>

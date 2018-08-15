@@ -194,3 +194,8 @@ FakesAssemblies/
 !**/[tT]ools/[nN]uget/
 !**/[tT]ools/XamlStyler/
 !**/[tT]ools/format_all_xaml.cmd
+/src/.vs/GongSolutions.WPF.DragDrop/v15/Server/sqlite3/storage.ide-wal
+/src/.vs/GongSolutions.WPF.DragDrop/v15/Server/sqlite3/storage.ide-shm
+/src/.vs/GongSolutions.WPF.DragDrop/v15/Server/sqlite3/storage.ide
+/src/.vs/GongSolutions.WPF.DragDrop/v15/Server/sqlite3/db.lock
+/src/.vs/GongSolutions.WPF.DragDrop/v15/Server/sqlite3

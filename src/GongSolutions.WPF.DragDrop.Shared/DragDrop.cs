@@ -9,6 +9,7 @@ using System.Windows.Media;
 using GongSolutions.Wpf.DragDrop.Icons;
 using GongSolutions.Wpf.DragDrop.Utilities;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 #if NET35
 using Microsoft.Windows.Controls;
 #endif
@@ -498,12 +499,32 @@ namespace GongSolutions.Wpf.DragDrop
                             try
                             {
                                 m_DragInProgress = true;
-                                var dragDropEffects = System.Windows.DragDrop.DoDragDrop(dragInfo.VisualSource, dataObject, dragInfo.Effects);
-                                if (dragDropEffects == DragDropEffects.None)
+
+                                if (dragHandler.UseDispatcher())
                                 {
-                                    dragHandler.DragCancelled();
+                                    DragDropEffects dragDropEffects = DragDropEffects.Move;
+
+                                    var dispatcherOp = ((DispatcherObject)sender).Dispatcher.BeginInvoke(
+                                        (Action)(() =>
+                                        {
+                                            dragDropEffects = System.Windows.DragDrop.DoDragDrop(dragInfo.VisualSource, dataObject, dragInfo.Effects);
+                                        })
+                                    );
+                                    dispatcherOp.Completed += (s, ev) => {
+                                        if (dragDropEffects == DragDropEffects.None)
+                                            dragHandler.DragCancelled();
+                                        dragHandler.DragDropOperationFinished(dragDropEffects, dragInfo);
+                                    };
                                 }
-                                dragHandler.DragDropOperationFinished(dragDropEffects, dragInfo);
+                                else
+                                {
+                                    var dragDropEffects = System.Windows.DragDrop.DoDragDrop(dragInfo.VisualSource, dataObject, dragInfo.Effects);
+                                    if (dragDropEffects == DragDropEffects.None)
+                                    {
+                                        dragHandler.DragCancelled();
+                                    }
+                                    dragHandler.DragDropOperationFinished(dragDropEffects, dragInfo);
+                                }
                             }
                             catch (Exception ex)
                             {
